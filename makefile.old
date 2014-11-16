@@ -1,0 +1,11 @@
+objects = test.o log.o
+test:$(objects)
+	gcc -o test -g $(objects) -lpthread
+test.o:log.h
+	gcc -c -g -lpthread test.c
+log.o:
+	gcc -c -g log.c
+
+.PHONY: clean
+clean:
+	rm test $(objects)

@@ -1,0 +1,56 @@
+as long as your program has to block when serializing tasks, you can still see improvements in response time and throughput when running on a uniprocessor, because some threads might be able to run while others are blocked.
+
+When a thread is created, there is no guarantee which will run first: the newly created thread or the calling thread. The newly created thread has access to the process address space and inherits the calling thread’s floating-point environment and signal mask; however, the set of pending signals for the thread is cleared.
+
+????????????
+The per-thread copy of errno is provided only for compatibility with existing functions that use it.
+
+If any thread within a process calls exit, _Exit, or _exit, then the entire process terminates.
+
+By calling pthread_join, we automatically place the thread with which we’re joining in the detached state (discussed shortly) so that its resources can be recovered.If the thread was already in the detached state, pthread_join can fail, returning EINVAL, although this behavior is implementation-specific.
+
+A restriction with these functions is that,because they can be implemented as macros, they must be used in matched pairs within the same scope in a thread. The macro definition of pthread_cleanup_push can include a { character, in which case the matching } character is in the pthread_cleanup_pop definition
+
+The only portable way to return in between these two functions(pthread_cleanup_push and pthread_cleanup_pop) is to call pthread_exit
+
+After a thread is detached, we can’t use the
+pthread_join function to wait for its termination status, because calling pthread_join for a detached thread results in undefined behavior. We can detach a thread by calling pthread_detach
+
+detached thread????
+
+On processor architectures in which the modification takes more than one memory cycle, this can happen when the memory read is interleaved between the memory write cycles
+
+If thread B reads the same variable between the two write cycles, it will see an inconsistent value.
+
+Increament steps:
+1. Read the memory location into a register.
+2. Increment the value in the register.
+3. Write the new value back to the memory location.
+
+
+In the previous example, if the increment takes only one memory cycle, then no race exists.
+
+The combination of the increment step and the decision-making step isn’t atomic, which
+opens a window where inconsistencies can arise.
+
+*****
+This mutual-exclusion mechanism works only if we design our threads to follow the same data-access rules
+
+If we allocate the mutex dynamically (by calling malloc, for example), then we need to call pthread_mutex_destroy before freeing the memory.
+
+pthread_mutex_trylock(...)
+
+Even though the reference count is zero, it would be a mistake for foo_rele to free the object’s memory if another thread is blocked on the mutex in a call to foo_hold. We can avoid this problem by ensuring that the object *can’t be found* before freeing its memory
+
+If enough locks and data structures are involved that the functions you have available can’t be molded to fit a simple hierarchy, then you’ll have to try some other approach.
+
+question:
+In the multithread of control environment,is the local variable of a function shared by different thread????
+
+before unlocking the hash list lock, locks the mutex in the new structure. Since the new structure is placed on a global list, other threads can find it, so we need to block them if they try to access the new structure, until we are done initializing it
+
+how to solve the lock-ordering issue?
+The lock-ordering issues surrounding the hash list and the reference count go away when we use the same lock for both purposes.
+
+Condition variables are another synchronization mechanism available to threads. These synchronization objects provide a place for threads to rendezvous.
+

@@ -1,0 +1,28 @@
+create one threads which continually put unachieved transaction log buffers into logbufqueue
+which point to the head of unachieved log buffers
+
+create one or more threads which continually get transaction log buffer from logbufqueue and 
+change the content of memery database according the log record stored in transaction log buffer,then move the buffer to achievelogbufqueue
+
+create one thread which write achievelogbufqueue to the hard disk
+
+/***************mutex*************************/
+
+thread1 will compete with thread2 for logbufqueue
+thread2 will compete with thread3 for achievelogbufqueue
+
+
+/***condition variable or semaphore mechanism***/
+
+if there is no logbuffer in logbufqueue thread2 will block,when thread1 put buffer into logbufqueue it will wake up thread1 only if thread1 is blocked.
+
+if there is no logbuffer in achievelogbufqueue thread3 will block,when thread2 put buffer into achievelogbufqueue it will wake up thread3 only if thread3 is blocked.
+
+/kk
+
+new:
+how thread2 change the memory database
+after thread get the uachieve buffer from uachievequeue:
+1.get databaseID,datatableID to find the target datatable.
+2.check whether the target table is now accessing by other thread.
+3.lock the table,change the table's record according logbuffer

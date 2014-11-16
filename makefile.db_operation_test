@@ -1,0 +1,13 @@
+objects =db_operation_test.o db_operation.o rbtree.o
+db_operation_test:$(objects)
+	gcc -o db_operation_test -g $(objects)
+db_operation_test.o:common.h
+	gcc -c -g db_operation_test.c
+db_operation.o:common.h
+	gcc -c -g db_operation.c
+rbtree.o:common.h
+	gcc -c -g rbtree.c
+
+.PHONY: clean
+clean:
+	rm db_operation_test $(objects)
